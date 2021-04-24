@@ -1,0 +1,13 @@
+
+- Screens
+    - Login modal
+        - username input
+        - pass input
+        - login()
+    - Tasks( initial page)
+        - username
+        - email
+        - task text
+        - task status
+        - pagination
+        - add newTask()
