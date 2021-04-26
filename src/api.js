@@ -8,7 +8,6 @@ export const GetTasks = async (app) => {
 
 export const AddTask = async (app) => {
     const AddTask = app.url + '/create?developer=IliaS';
-
     const Taskform = new FormData();
     Taskform.append("username", app.username);
     Taskform.append("email", app.email);
@@ -23,10 +22,16 @@ export const AddTask = async (app) => {
 
 export const EditTask = async (app) => {
     const AddTask = app.url + `/edit/${app.editID}?developer=IliaS`;
-    console.log(app.token);
+    const statusKey = (app) => {
+        if (app.new === "true") {
+            return "11"
+        } else {
+            return app.status
+        }
+    }
     const Taskform = new FormData();
     Taskform.append("text", app.text);
-    Taskform.append("status", app.status);
+    Taskform.append("status", statusKey(app));
     Taskform.append("token", app.token);
 
     const resp = await fetch(AddTask, {

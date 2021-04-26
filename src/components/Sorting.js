@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Dropdown } from 'react-bootstrap';
 import { useStoreon } from 'storeon/react'
 
-const Sort = (props) => {
+const Sort = () => {
     const { dispatch, app } = useStoreon('app')
     return (
         <div>

@@ -13,10 +13,10 @@ function App() {
   const { dispatch, app } = useStoreon('app')
   useEffect(() => {
     dispatch('get/tasks')
-  }, [app.total_tasks_count, app.sort_direction, app.page, app.sort_field, app.status, dispatch])
-
-  console.log(app);
-
+  }, [
+    app.total_tasks_count, app.sort_direction, app.page, app.sort_field, app.status,
+    dispatch
+  ])
   return (
     <div>
       { app.tasks && app.total_task_count > "0" ? <Tasks /> : <h3>No Tasks</h3>}

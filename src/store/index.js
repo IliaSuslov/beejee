@@ -1,7 +1,9 @@
 import { createStoreon } from 'storeon'
 import { GetTasks, AddTask, EditTask, Login } from '../api'
+import { persistState } from '@storeon/localstorage'
+import { crossTab } from '@storeon/crosstab'
 
-const State = {
+const tasks = {
     url: 'https://uxcandy.com/~shapoval/test-task-backend/v2',
     login: "",
     password: "",
@@ -19,7 +21,7 @@ const State = {
 }
 
 export const app = store => {
-    store.on('@init', () => ({ app: State }))
+    store.on('@init', () => ({ app: tasks }))
     store.on('tasks/changed', ({ app }, payload) => ({
         app: { ...app, ...payload }
     }))
@@ -38,6 +40,24 @@ export const app = store => {
         let res = dir();
         return { app: { ...app, sort_direction: res } }
     })
+    store.on('status/changed', ({ app }, { status }) => {
+        let checkStatus = (status) => {
+            switch (status) {
+                case "задача не выполнена":
+                    return 0;
+                case "задача не выполнена, отредактирована админом":
+                    return 1;
+                case "задача выполнена":
+                    return 10;
+                case "задача отредактирована админом и выполнена":
+                    return 11;
+                default:
+                    return status;
+            }
+        }
+        let res = checkStatus(status)
+        return { app: { ...app, status: res } }
+    })
     store.on('add/task', ({ app }) => {
         try {
             AddTask(app)
@@ -54,7 +74,7 @@ export const app = store => {
         try {
             EditTask(app).then(res =>
                 res.status !== "ok" ? store.dispatch('tasks/changed', { error: res.message, status: res.status })
-                    : store.dispatch('tasks/changed', { editID: false, text: "", status: "", error: "" }
+                    : store.dispatch('tasks/changed', { editID: false, text: "", status: "", error: "", new: "false" }
                     ))
             store.dispatch('get/tasks')
         } catch (err) {
@@ -63,9 +83,10 @@ export const app = store => {
     store.on('login', ({ app }) => {
         try {
             Login(app).then(res =>
+
                 res.status !== "ok" ? store.dispatch('tasks/changed', { error: res.message, status: res.status })
-                    : store.dispatch('tasks/changed', { token: res.message.token, loggedIn: !app.loggedIn, error: "" }
-                    ))
+                    : store.dispatch('tasks/changed', { token: res.message.token, loggedIn: !app.loggedIn, error: "" })
+            )
         }
         catch (err) {
             console.log(err);
@@ -74,4 +95,6 @@ export const app = store => {
 }
 export default createStoreon([
     app,
+    persistState(['app']),
+    crossTab({ filter: (event) => event === 'tasks/changed' })
 ]);
